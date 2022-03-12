@@ -1,0 +1,58 @@
+service: websocket-test
+
+frameworkVersion: '2 || 3'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, self:custom.defaultStage}
+  region: ${self:custom.region.${self:provider.stage}}
+  memorySize: 256
+  role: ${self:custom.role.${self:provider.stage}}
+  profile: ${self:custom.profiles.${self:provider.stage}}
+  websocketsApiName: ${self:service}-apigw-websocket-${opt:stage, self:provider.stage}
+  websocketsApiRouteSelectionExpression: $request.body.action
+  environment:
+    WEBSOCKET_API_ENDPOINT: !Join ['', ['https://', !Ref WebsocketsApi, '.execute-api.', '${opt:region, self:provider.region}', '.amazonaws.com/', '${opt:stage, self:provider.stage}/']]
+    DYNAMODB_SOCKETS_TABLE: 'websocket-test2'
+    DYNAMODB_SOCKETS_TYPE_GSI: 'code'
+
+
+custom:
+  defaultStage: dev
+  profiles:
+    dev: serverless_dev
+  region:
+    dev: us-west-2
+  role:
+    dev: 'arn:{your_arn_role}'
+
+
+functions:
+  defaultSocketHandler:
+    name: ${self:service}-${self:provider.stage}-defaultSocketHandler
+    handler: handler.defaultSocketHandler
+    events:
+      - websocket:
+          route: $default
+  handleSocketConnect:
+    name: ${self:service}-${self:provider.stage}-handleSocketConnect
+    handler: handler.handleSocketConnect
+    events:
+      - websocket:
+          route: $connect
+  handleSocketDisconnect:
+    name: ${self:service}-${self:provider.stage}-handleSocketDisconnect
+    handler: handler.handleSocketDisconnect
+    events:
+      - websocket:
+          route: $disconnect
+  handlerSocketSendMessage:
+    name: ${self:service}-${self:provider.stage}-handlerSocketSendMessage
+    handler: handler.handlerSocketSendMessage
+    events:
+      - websocket:
+          route: sendMessage
+
+plugins:
+  - serverless-offline
