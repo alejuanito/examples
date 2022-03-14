@@ -5,7 +5,6 @@ const dynamodbConnector = require('./../connector/dynamodb.connector');
 
 const defaultSocketHandler = async (event, context) => {
     try {
-        const data = JSON.parse(event.body);
         const action = data.action;
         const connectionId = event.requestContext.connectionId;
         switch (action) {
@@ -38,12 +37,12 @@ const defaultSocketHandler = async (event, context) => {
         }
     }
 };
+
 const handlerSocketSendMessage = async (event, context) => {
     try {
-        const data = JSON.parse(event.body);
-        const action = data.action;
+        const action = event.queryStringParameters.action;
         const connectionId = event.requestContext.connectionId;
-
+        console.log('action', action);
         switch (action) {
             case 'PING':
                 const pingResponse = JSON.stringify({action: 'PING', value: 'PONG'});
@@ -52,14 +51,13 @@ const handlerSocketSendMessage = async (event, context) => {
             case 'ORDER':
                 const sockets = await dynamodbConnector.findSocketsByCode(event.queryStringParameters.code);
                 for (const element of sockets.Items) {
-                    await apigatewayConnector.generateSocketMessage(element.connectionId.S, `${element.code.S}: ${data.message}`);
-                };
+                    await apigatewayConnector.generateSocketMessage(element.connectionId, `${element.code}: ${event.queryStringParameters.message}`);
+                  };
                 break;
             default:
                 const invalidResponse = JSON.stringify({action: 'ERROR', error: 'Invalid request'});
                 await apigatewayConnector.generateSocketMessage(connectionId, invalidResponse);
         }
-
         return {
             statusCode: 200,
             headers: {
@@ -84,9 +82,9 @@ const handlerSocketSendMessage = async (event, context) => {
 const handleSocketConnect = async (event, context) => {
     try {
         const connectionId = event.requestContext.connectionId;
-        //const connectionType = event.queryStringParameters.connectionType;
+        const connectionType = event.queryStringParameters.connectionType;
         const code = event.queryStringParameters.code;
-        await dynamodbConnector.registerSocket(connectionId, code);
+        await dynamodbConnector.registerSocket(connectionId, code, connectionType);
         return {
             statusCode: 200,
             headers: {

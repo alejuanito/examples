@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test WebSockets</title>
+</head>
+<body>
+  <h1>WebSocket Client Implementation</h1>
+  <button id="wsConnect">Connect to WebSocket</button>
+  <script>
+    const button = document.querySelector("#wsConnect");
+    button.addEventListener("click", () => {
+      const url = "wss://{url_apigateway}.amazonaws.com/cert?connectionType=SS&code=94fb672a-d610-4554-9032-e2a8d895cf51";
+      const wsClient = new WebSocket(url);
+      wsClient.onopen = () => {
+        const data = { message: 'Hello from the client!' }
+        const json = JSON.stringify(data);
+        console.log(`Connection to ${url} has been established`);
+      };
+      wsClient.onmessage = (e) => {
+        console.log(e.data);
+      };
+      wsClient.onerror = (err) => {
+        console.log(`WebSocket error: ${err}`);
+      };
+      wsClient.onclose = (event) => {
+        console.log("close from client", event.code, event.reason)
+      }
+    });
+  </script>
+</body>
+</html>
