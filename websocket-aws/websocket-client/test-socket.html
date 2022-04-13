@@ -12,7 +12,7 @@
   <script>
     const button = document.querySelector("#wsConnect");
     button.addEventListener("click", () => {
-      const url = "wss://{url_apigateway}.amazonaws.com/cert?connectionType=SS&code=94fb672a-d610-4554-9032-e2a8d895cf51";
+      const url = "wss://owz5qadail.execute-api.us-west-2.amazonaws.com/cert?connectionType=SS&code=94fb672a-d610-4554-9032-e2a8d895cf51";
       const wsClient = new WebSocket(url);
       wsClient.onopen = () => {
         const data = { message: 'Hello from the client!' }
