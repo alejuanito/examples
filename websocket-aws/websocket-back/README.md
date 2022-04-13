@@ -12,11 +12,29 @@ authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
 -->
 
 
-# Serverless Framework AWS NodeJS Example
+# Websocket AWS Gateway - Lamba - NodeJS  Example
 
-This template demonstrates how to deploy a NodeJS function running on AWS Lambda using the traditional Serverless Framework. The deployed function does not include any event definitions as well as any kind of persistence (database). For more advanced configurations check out the [examples repo](https://github.com/serverless/examples/) which includes integrations with SQS, DynamoDB or examples of functions that are triggered in `cron`-like manner. For details about configuration of specific `events`, please refer to our [documentation](https://www.serverless.com/framework/docs/providers/aws/events/).
+In this repository you will find an example of websocket using api gateway and lambdas in aws, for this example I will use DynamoDB and you must have basic knowledge of IAM roles.
 
 ## Usage
+
+you must have serverless framework installed
+
+### Configuration
+In serverless.yml replace: 
+
+```
+{your_arn_role}
+```
+
+You need to create a Dynamo table and configure these enviroment variables:
+
+```
+process.env.DYNAMODB_SOCKETS_TYPE_GSI
+process.env.DYNAMODB_SOCKETS_TABLE
+process.env.WEBSOCKET_API_ENDPOINT
+```
+
 
 ### Deployment
 
@@ -53,38 +71,4 @@ functions:
   api: aws-node-dev-hello
 layers:
   None
-```
-
-### Invocation
-
-After successful deployment, you can invoke the deployed function by using the following command:
-
-```bash
-serverless invoke --function hello
-```
-
-Which should result in response similar to the following:
-
-```json
-{
-    "statusCode": 200,
-    "body": "{\n  \"message\": \"Go Serverless v2.0! Your function executed successfully!\",\n  \"input\": {}\n}"
-}
-```
-
-### Local development
-
-You can invoke your function locally by using the following command:
-
-```bash
-serverless invoke local --function hello
-```
-
-Which should result in response similar to the following:
-
-```
-{
-    "statusCode": 200,
-    "body": "{\n  \"message\": \"Go Serverless v2.0! Your function executed successfully!\",\n  \"input\": \"\"\n}"
-}
 ```
